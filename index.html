@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Tatti Diwas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;700&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght=0,300;0,500;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css?v=2.0">
+</head>
+
+<body class="hero-bg scratch-active">
+
+  <!-- TROLL OVERLAY (FULLSCREEN FINGER.GIF - TOUCH/TAP TO REVEAL) -->
+  <div id="scratch-overlay" class="tap-reveal-overlay" role="button" tabindex="0" title="Tap anywhere to reveal!">
+    <div class="scratch-blurred-bg" style="background-image: url('assests/finger.gif');"></div>
+    <img src="assests/finger.gif" alt="Surprise!" id="scratch-bg-gif" class="scratch-fullscreen-gif" />
+
+    <div class="scratch-ui-overlay">
+      <!-- Funky Name Animated Headline (Only visible when GIF is present) -->
+      <div class="funky-name-container">
+        <span class="funky-tagline">Zyada expectation mat rakha kar apun se</span>
+        <h1 id="funky-name-display" class="funky-name-title">Guhh kha le gawar💩</h1>
+      </div>
+
+      <!-- Floating Touch/Tap Prompt -->
+      <div class="scratch-tap-hint">
+        <span class="tap-pulse-icon">👆</span> Tap / Touch anywhere to reveal ✨
+      </div>
+    </div>
+  </div>
+
+  <div id="scroll-progress"></div>
+  <div id="cinematic-vignette"></div>
+
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <audio id="bg-music" loop preload="auto" playsinline>
+    <source src="assests/bgmusic.mp3" type="audio/mpeg">
+    <source src="assests/bgmusic.mpeg" type="audio/mpeg">
+  </audio>
+
+  <!-- Troll overlay audio (plays immediately on page load / first tap) -->
+  <audio id="faah-audio" preload="auto" playsinline>
+    <source src="assests/faah.mp3" type="audio/mpeg">
+    <source src="assests/faah.mpeg" type="audio/mpeg">
+  </audio>
+
+  <audio id="swap-sound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end gap-3"
+    style="bottom: max(1rem, env(safe-area-inset-bottom));">
+    <button id="music-toggle">
+      <span id="eq-display" class="flex items-end gap-0.5 h-4">
+        <span class="eq-bar" style="height:8px"></span>
+        <span class="eq-bar" style="height:14px"></span>
+        <span class="eq-bar" style="height:6px"></span>
+        <span class="eq-bar" style="height:12px"></span>
+      </span>
+      <span id="music-label">Now Playing</span>
+    </button>
+  </div>
+
+  <header
+    class="min-h-[100dvh] relative flex flex-col items-center justify-center text-center px-6 py-20 overflow-hidden">
+    <div class="grid-overlay"></div>
+
+    <span class="sticker" style="top:8%;left:6%;animation-delay:0s">🌸</span>
+    <span class="sticker" style="top:12%;right:8%;animation-delay:1.2s">✨</span>
+    <span class="sticker" style="bottom:14%;left:10%;animation-delay:0.6s">🎀</span>
+    <span class="sticker" style="bottom:18%;right:6%;animation-delay:2s">🌿</span>
+    <span class="sticker" style="top:32%;left:3%;animation-delay:1.6s;font-size:26px;">🎨</span>
+    <span class="sticker" style="top:40%;right:4%;animation-delay:2.4s;font-size:26px;">🖌️</span>
+
+    <div class="absolute -top-20 -left-20 w-96 h-96 rounded-full opacity-30 pointer-events-none"
+      style="background:radial-gradient(circle,var(--blush),transparent 70%); animation: float 10s ease-in-out infinite;">
+    </div>
+    <div class="absolute -bottom-20 -right-20 w-80 h-80 rounded-full opacity-20 pointer-events-none"
+      style="background:radial-gradient(circle,var(--sage),transparent 70%); animation: float 12s ease-in-out 3s infinite;">
+    </div>
+
+    <div
+      class="relative z-10 max-w-2xl mx-auto backdrop-blur-md bg-white/40 border border-white/60 rounded-3xl p-6 sm:p-10 md:p-16 shadow-[0_24px_80px_rgba(42,31,26,0.06)]"
+      style="animation: fadeUp 1.2s cubic-bezier(0.16,1,0.3,1) both;">
+      <p class="section-label mb-6">Khi Khi Khi Khi</p>
+
+      <h1 id="hb-title" class="font-display text-6xl sm:text-8xl md:text-[110px] leading-none mb-4 sm:mb-6">
+      </h1>
+
+      <!-- <p
+        class="text-base md:text-lg text-[color:var(--ink)] opacity-60 font-light leading-relaxed mb-3 max-w-md mx-auto">
+        Some moments are too special to live only in camera rolls.<br />
+        I made this for you. Scroll down.
+      </p> -->
+      <p class="text-sm italic opacity-45 font-light mb-14 max-w-md mx-auto">
+        Warning: Bejatti apne tak hi rakhni h to akele hi dekhiyo.
+      </p>
+
+      <a href="#timeline" class="inline-flex items-center gap-2 text-sm opacity-50 hover:opacity-90 transition-opacity"
+        style="letter-spacing:0.06em;">
+        <span style="animation: float 2s ease-in-out infinite; display:inline-block;">↓</span>
+        Scroll to begin
+      </a>
+    </div>
+  </header>
+
+  <section id="timeline" class="max-w-5xl mx-auto py-12 sm:py-24 px-4 sm:px-6 relative">
+    <div class="text-center mb-20 fade-up">
+      <!-- <p class="section-label mb-3">Our Story</p> -->
+      <h2 class="font-display text-3xl sm:text-5xl md:text-6xl" style="color:var(--ink)">Moments you should Never Forget
+        about yourself</h2>
+      <p class="opacity-50 font-light text-sm mt-4 max-w-md mx-auto italic">
+        (Just like you never forget the faces of your GAY crushes. We don't talk about that... 😂🤣🤣)
+      </p>
+    </div>
+
+    <div class="relative" id="memories-container">
+      <canvas id="timeline-sparkle-canvas" class="hidden md:block"></canvas>
+    </div>
+  </section>
+
+  <section class="max-w-3xl mx-auto py-12 sm:py-24 px-4 sm:px-6" id="unlock-section">
+    <div class="fade-up" id="unlock-card">
+      <div class="text-center mb-12">
+        <p class="section-label mb-3">Maksad nhi bhulna Paayijaan</p>
+        <h2 class="font-display text-4xl md:text-5xl mb-4" style="color:var(--ink)">🔓 Puzzle Unlock</h2>
+        <p class="opacity-60 font-light max-w-md mx-auto text-sm leading-relaxed mb-2">
+          Scrambled one of my memories, Let's see if you too have this in your hard disk. Arrange the full picture
+          pieces to unlock your birthday surprise.
+        </p>
+        <p class="opacity-45 font-light max-w-md mx-auto text-xs italic mb-6">
+          Tap two tiles to swap them.
+        </p>
+
+        <div id="diff-wrap" class="flex flex-wrap gap-2 justify-center mb-6">
+          <button class="diff-btn" data-n="3">3×3</button>
+          <button class="diff-btn" data-n="4">4×4 Grid</button>
+          <button class="diff-btn active" data-n="5">5×5 (easy)</button>
+        </div>
+      </div>
+
+      <div
+        class="relative backdrop-blur-md bg-white/60 border border-white/60 rounded-3xl p-6 md:p-8 shadow-[0_20px_50px_rgba(42,31,26,0.05)] max-w-md mx-auto overflow-hidden">
+        <div class="washi"></div>
+
+        <div id="puzzle-wrap">
+          <div id="grid"></div>
+          <div id="win-reveal"></div>
+        </div>
+
+        <div id="progress-wrap">
+          <div class="flex justify-between text-xs opacity-50 font-bold mb-2 uppercase tracking-wider">
+            <span>Match Accuracy</span>
+            <span id="progress-pct">0%</span>
+          </div>
+          <div id="progress-bar">
+            <div id="progress-fill"></div>
+          </div>
+        </div>
+
+        <div
+          class="text-center mt-6 text-xs font-bold uppercase tracking-widest opacity-50 flex items-center justify-center gap-1.5">
+          <span>Moves Counter:</span>
+          <span id="move-count" class="text-xl font-puzzle text-[color:var(--rose)] leading-none">0</span>
+          <span id="move-roast" class="normal-case font-normal italic opacity-70"></span>
+        </div>
+
+        <div class="flex gap-3 mt-6 w-full">
+          <button id="btn-hint" class="btn-secondary flex-1">Hint (tujhe zaroorat to padegi hi)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-2xl mx-auto py-12 sm:py-24 px-4 sm:px-6 hidden" id="letter-section">
+    <div class="text-center mb-8 sm:mb-12 fade-up">
+      <p class="section-label mb-3">Just For You</p>
+      <h2 class="font-display text-3xl sm:text-5xl md:text-6xl" style="color:var(--ink)">A Letter from God</h2>
+    </div>
+
+    <div class="fade-up delay-1" id="letter-card">
+      <div class="letter-paper font-display text-lg" style="color:var(--ink); line-height:32px;">
+        <p class="italic text-2xl mb-6" style="line-height:1.6;">Happy birthday</p>
+        
+        <p class="mb-4">
+          I hope this birthday is as bright, beautiful, and inspiring as the art you create. Here's to a thousand more
+          memories
+        </p>
+        <p class="mb-4">
+          Isko banane ka plan nhi tha. phir koi gift bhi nhi aa rha tha dimag me... to socha chalo yaar kucch bna hi lete hain. 
+        </p>
+        <p class="mb-4">
+          bete party abhi diya nhi hai tune... or dusri wali lambi bhasad bhi baki hai...😂😂😂
+          or maine ise itne dhyan se banaya nhi AI se banwaya hai to kahin kucch awkward type ka lage to manage kar liyo... kafi jagah changes to kiye hai maine.
+        </p>
+
+        <p class="mt-10 text-xl italic">
+          With all my timepass (and zero tension or loads),<br />
+          <span class="text-2xl" style="color:var(--rose)">Your Best Friend 🌸</span>
+        </p>
+
+        <div
+          class="mt-12 flex flex-col items-center justify-center border-t border-[rgba(180,160,140,0.2)] pt-8 relative">
+          <p class="text-sm italic opacity-60 mb-6 font-sans">P.S. I got you a very expensive gift. Click the button to
+            claim it.</p>
+          <div
+            style="position: relative; width: 100%; height: 80px; display: flex; justify-content: center; align-items: center;">
+            <button id="gift-btn" class="btn-primary"
+              style="position: absolute; transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1); z-index: 20;">Claim Gift
+              🎁</button>
+          </div>
+          <p id="gift-msg"
+            class="text-lg font-bold text-[color:var(--rose)] mt-4 opacity-0 transition-opacity duration-500 transform translate-y-4 font-sans text-center">
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="secret-popup">
+    <div class="secret-letter font-display">
+      <span class="close-secret" id="close-secret" title="Close">×</span>
+
+      <p class="italic secret-note-title mb-4 font-semibold" style="color:var(--mauve);">Aisa likhne ka Mann to nhi tha
+        but..</p>
+
+      <!-- DUO image -->
+      <div class="mb-5 flex justify-center secret-duo-wrap">
+        <img src="assests/DUO.jpeg" alt="The Duo" class="secret-duo-img rounded-2xl shadow-md" />
+      </div>
+      <div class="space-y-6 leading-relaxed text-[16px]">
+
+        <p class="mb-4">
+          Dekh Bhai.<br />
+          Zyada to kya hi bola Jaye suwaron ko.
+          <span class="font-semibold" style="color:var(--rose);">
+            It's like bhaisiya k aage bin bajana.
+          </span>
+        </p>
+        
+        <p class="mb-4">
+          <span class="font-semibold">Should I be Sorry or Thankful? OR both or None....</span>
+          <br />
+          To Rishikesh ka trip me girane k baad😂,
+          <span class="italic">'It was and is really regretful'</span>,
+          Cafe me meri coloring, daal achanak se hi jal jane,
+          or bhi chizen hongi, in sab k liye..
+          <span class="font-semibold" style="color:var(--rose);">Sorry</span>
+        </p>
+        
+        <p class="mb-4">
+          Or us din sham me call Kar k sorry bolne ki zaroorat bhi nhi thi 😂,
+          itni to understanding hai hi ki kis baat ko kitna value dena h.
+        </p>
+        
+        <p class="mb-4">
+          Or kya hi bolein.. bas ..
+          <span class="font-semibold tracking-wide" style="color:var(--rose);">
+            DHANIYABAAD
+          </span>
+          keh sakte hain: FOR being a understanding person, Being an Emergency
+          help, for being a good friend, listener and plenty other things.
+        </p>
+
+        <p class="mb-4">
+          Why don't you make suggestions for me... after all, you know me more than else. I am sure you will have some good suggestions for me, apart from bakchodi. 
+        </p>
+        
+        <p class="mb-6">
+          Agar yaha tak pahuch hi gyi h to
+          <strong style="color:var(--rose);">"got it"</strong>
+          ka text bhi dal diye. 😄
+        </p>
+
+      </div>
+
+      <p class="mt-6 text-xl italic secret-signoff">
+        le fir,<br />
+        <span class="text-2xl" style="color:var(--rose);">Your Devta Friend</span>
+      </p>
+    </div>
+  </div>
+
+  <div id="roast-popup">
+    <div class="roast-card">
+      <h3 id="roast-title" class="font-puzzle text-5xl mb-3 text-[color:var(--rose)]">Chiiii Gawar !!</h3>
+      <p id="roast-line" class="font-display text-2xl mb-8 opacity-80" style="color:var(--ink);">Dimag nhi hai kya? 🤡
+      </p>
+      <button id="close-roast" class="btn-primary w-full" style="font-size: 1rem;">Please show me the hint.
+        Prabhu!!</button>
+    </div>
+  </div>
+
+  <!-- DIFFICULTY / INTELLIGENCE ROAST POPUP -->
+  <div id="diff-roast-popup">
+    <div class="roast-card">
+      <h3 id="diff-roast-title" class="font-puzzle text-4xl sm:text-5xl mb-3 text-[color:var(--rose)]"></h3>
+      <p id="diff-roast-line" class="font-display text-xl sm:text-2xl mb-8 opacity-80" style="color:var(--ink);"></p>
+      <button id="close-diff-roast" class="btn-primary w-full" style="font-size: 1rem;"></button>
+    </div>
+  </div>
+
+  <!-- MEDIA LIGHTBOX POPUP -->
+  <div id="media-lightbox" class="media-lightbox" aria-hidden="true">
+    <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+    <div class="lightbox-dialog">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close modal">×</button>
+      <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous">‹</button>
+      <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next">›</button>
+
+      <div class="lightbox-media-wrap" id="lightbox-media-wrap">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="lightbox-info">
+        <span class="lightbox-badge" id="lightbox-date"></span>
+        <h3 class="lightbox-title font-display" id="lightbox-title"></h3>
+        <p class="lightbox-desc" id="lightbox-desc"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="floater-text" class="floater-text font-puzzle"></div>
+  <div id="secret-countdown" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
